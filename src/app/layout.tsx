@@ -28,31 +28,28 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased dark`}
     >
-      <body className="min-h-full flex flex-col bg-zinc-950 text-zinc-50">
-        <header className="sticky top-0 z-50 w-full border-b border-zinc-800 bg-zinc-950/80 backdrop-blur">
+      <body className="h-full flex flex-col bg-zinc-950 text-zinc-50 overflow-hidden">
+        <header className="fixed top-0 z-50 w-full bg-gradient-to-b from-black/80 to-transparent">
           <div className="container mx-auto flex h-16 items-center justify-between px-4">
-            <Link href="/" className="text-xl font-bold tracking-tight text-white">
+            <Link href="/" className="text-xl font-bold tracking-tight text-white drop-shadow-md">
               EditVerse
             </Link>
-            <nav className="flex items-center space-x-6 text-sm font-medium">
-              <Link href="/" className="transition-colors hover:text-white text-zinc-400">
+            <nav className="flex items-center space-x-6 text-sm font-medium drop-shadow-md">
+              <Link href="/" className="transition-colors hover:text-white text-zinc-300">
                 Home
               </Link>
-              <Link href="/upload" className="transition-colors hover:text-white text-zinc-400">
+              <Link href="/upload" className="transition-colors hover:text-white text-zinc-300">
                 Upload
               </Link>
-              <Link href="/profile" className="transition-colors hover:text-white text-zinc-400">
+              <Link href="/profile" className="transition-colors hover:text-white text-zinc-300">
                 Profile
               </Link>
             </nav>
           </div>
         </header>
-        <main className="flex-1">
+        <div className="flex-1 w-full h-full relative z-0">
           {children}
-        </main>
-        <footer className="border-t border-zinc-800 py-6 text-center text-sm text-zinc-500">
-          <p>© {new Date().getFullYear()} EditVerse. All rights reserved.</p>
-        </footer>
+        </div>
       </body>
     </html>
   );

@@ -1,11 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import { Upload as UploadIcon, X } from "lucide-react";
+import { Upload as UploadIcon, X, Loader2 } from "lucide-react";
+import { uploadEdit } from "@/lib/actions";
+import { useRouter } from "next/navigation";
 
 export default function UploadPage() {
   const [dragActive, setDragActive] = useState(false);
   const [file, setFile] = useState<File | null>(null);
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [isUploading, setIsUploading] = useState(false);
+  const router = useRouter();
 
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault();
@@ -38,8 +44,30 @@ export default function UploadPage() {
     setFile(null);
   };
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!file || !title) return;
+
+    setIsUploading(true);
+
+    try {
+      const formData = new FormData();
+      formData.append("video", file);
+      formData.append("title", title);
+      formData.append("description", description);
+
+      await uploadEdit(formData);
+      router.push("/profile");
+    } catch (error) {
+      console.error("Upload failed", error);
+      alert("Upload failed. Please try again.");
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
   return (
-    <div className="container mx-auto max-w-2xl px-4 py-12">
+    <div className="container mx-auto max-w-2xl px-4 py-12 h-full overflow-y-auto pt-24 pb-12">
       <div className="mb-8 text-center">
         <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
           Upload your Edit
@@ -50,7 +78,7 @@ export default function UploadPage() {
       </div>
 
       <div className="rounded-2xl bg-zinc-900 border border-zinc-800 p-6 shadow-xl">
-        <form className="space-y-6">
+        <form className="space-y-6" onSubmit={handleSubmit}>
           <div>
             <label className="block text-sm font-medium text-zinc-300 mb-2">
               Video File
@@ -93,7 +121,6 @@ export default function UploadPage() {
                   type="button"
                   onClick={removeFile}
                   className="ml-4 rounded-full p-1 text-zinc-400 hover:bg-zinc-800 hover:text-white transition-colors"
-                  aria-label="Remove file"
                 >
                   <X className="h-5 w-5" />
                 </button>
@@ -108,7 +135,10 @@ export default function UploadPage() {
             <input
               type="text"
               id="title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
               placeholder="e.g. Cyberpunk Cinematic"
+              required
               className="w-full rounded-xl border border-zinc-700 bg-zinc-950/50 px-4 py-3 text-sm text-white placeholder-zinc-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-colors"
             />
           </div>
@@ -120,16 +150,26 @@ export default function UploadPage() {
             <textarea
               id="description"
               rows={4}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
               placeholder="Tell us about your edit..."
               className="w-full rounded-xl border border-zinc-700 bg-zinc-950/50 px-4 py-3 text-sm text-white placeholder-zinc-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-colors resize-none"
             />
           </div>
 
           <button
-            type="button"
-            className="w-full rounded-xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 transition-all"
+            type="submit"
+            disabled={!file || !title || isUploading}
+            className="w-full flex items-center justify-center rounded-xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Publish Edit
+            {isUploading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Uploading...
+              </>
+            ) : (
+              "Publish Edit"
+            )}
           </button>
         </form>
       </div>

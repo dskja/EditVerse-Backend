@@ -1,12 +1,19 @@
-import { MOCK_EDITS } from "@/data/mockData";
+import { getUser, getUserEdits } from "@/lib/actions";
 import EditCard from "@/components/EditCard";
 import { Settings, Users, Video } from "lucide-react";
+import { notFound } from "next/navigation";
 
-export default function ProfilePage() {
-  const userEdits = MOCK_EDITS.filter((edit) => edit.editorId === "e1");
+export default async function ProfilePage() {
+  const userId = "u1"; // Simulated logged in user
+  const user = await getUser(userId);
+  const userEdits = await getUserEdits(userId);
+
+  if (!user) {
+    notFound();
+  }
 
   return (
-    <div className="container mx-auto px-4 py-12">
+    <div className="container mx-auto px-4 py-12 h-full overflow-y-auto pt-24 pb-12">
       <div className="mb-12 overflow-hidden rounded-2xl bg-zinc-900 border border-zinc-800">
         <div className="h-48 bg-gradient-to-r from-indigo-600 to-purple-600 relative overflow-hidden">
           <div className="absolute inset-0 bg-black/20" />
@@ -19,8 +26,8 @@ export default function ProfilePage() {
             </div>
 
             <div className="mt-6 sm:mt-0 sm:flex-1 sm:pb-2">
-              <h1 className="text-3xl font-bold text-white">NeonVFX</h1>
-              <p className="text-zinc-400">@neon_vfx</p>
+              <h1 className="text-3xl font-bold text-white">{user.name}</h1>
+              <p className="text-zinc-400">@{user.username}</p>
             </div>
 
             <div className="mt-6 flex sm:mt-0 sm:pb-2 gap-3">
@@ -39,21 +46,21 @@ export default function ProfilePage() {
                 <Video className="mr-1.5 h-4 w-4" />
                 Edits
               </div>
-              <p className="mt-1 text-2xl font-semibold text-white">12</p>
+              <p className="mt-1 text-2xl font-semibold text-white">{userEdits.length}</p>
             </div>
             <div>
               <div className="flex items-center text-sm font-medium text-zinc-400">
                 <Users className="mr-1.5 h-4 w-4" />
                 Followers
               </div>
-              <p className="mt-1 text-2xl font-semibold text-white">1.2k</p>
+              <p className="mt-1 text-2xl font-semibold text-white">{user.followers}</p>
             </div>
             <div>
               <div className="flex items-center text-sm font-medium text-zinc-400">
                 <Users className="mr-1.5 h-4 w-4" />
                 Following
               </div>
-              <p className="mt-1 text-2xl font-semibold text-white">84</p>
+              <p className="mt-1 text-2xl font-semibold text-white">{user.following}</p>
             </div>
           </div>
         </div>
@@ -62,15 +69,15 @@ export default function ProfilePage() {
       <div>
         <h2 className="text-2xl font-bold text-white mb-6">My Edits</h2>
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {userEdits.map((edit) => (
-            <EditCard key={edit.id} edit={edit} />
-          ))}
-          {userEdits.map((edit) => (
-            <EditCard key={edit.id + "clone"} edit={{...edit, id: edit.id + "clone"}} />
-          ))}
-          {userEdits.map((edit) => (
-            <EditCard key={edit.id + "clone2"} edit={{...edit, id: edit.id + "clone2"}} />
-          ))}
+          {userEdits.length > 0 ? (
+            userEdits.map((edit) => (
+              <EditCard key={edit.id} edit={edit} />
+            ))
+          ) : (
+            <div className="col-span-full py-12 text-center text-zinc-500">
+              No edits uploaded yet. Let's make something awesome!
+            </div>
+          )}
         </div>
       </div>
     </div>
