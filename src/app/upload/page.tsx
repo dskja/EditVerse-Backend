@@ -93,6 +93,7 @@ export default function UploadPage() {
                   type="button"
                   onClick={removeFile}
                   className="ml-4 rounded-full p-1 text-zinc-400 hover:bg-zinc-800 hover:text-white transition-colors"
+                  aria-label="Remove file"
                 >
                   <X className="h-5 w-5" />
                 </button>
